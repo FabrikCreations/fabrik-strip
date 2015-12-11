@@ -1,0 +1,30 @@
+{
+  "name": "fabrik-strip",
+  "homepage": "https://github.com/phil118/fabrik-strip",
+  "authors": [
+    {
+      "name": "Phil Jenkins",
+      "homepage": "https://fabrik.io"
+    }
+  ],
+  "description": "Plugin for the Fabrik default themes project details strip layout",
+  "main": [
+    "fabrik.strip.js",
+    "fabrik.strip.css"
+  ],
+  "dependencies": {
+    "jquery": "~2.1"
+  },
+  "keywords": [
+    "fabrik",
+    "strip"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
