@@ -1,3 +1,7 @@
+.fabrik-strip {
+  height: 100%;
+}
+
 .strip-wrap {
   overflow: hidden;
   height: 100%;
@@ -43,7 +47,7 @@
   padding: 0;
   position: relative;
   opacity: 0;
-  
+  overflow: hidden;
 	transition: transform 300ms ease;
 	-webkit-transition: transform 300ms ease;
 	-o-transition: transform 300ms ease;

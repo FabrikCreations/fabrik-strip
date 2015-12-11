@@ -27,6 +27,10 @@
   perspective: @type;
 }
 
+.fabrik-strip {
+  height: 100%;
+}
+
 .strip-wrap {
   overflow: hidden;
   height: 100%;
@@ -57,6 +61,7 @@
   position: relative;
   opacity: 0;  
 	.transition(transform 300ms ease);
+	overflow: hidden;
 	
 	&:after {
 		position: absolute;
