@@ -36,7 +36,7 @@
         return;
       }
 
-      $('button', self.options.pagerSelector).show();
+      $('button', $(self.options.pagerSelector)).show();
 
       if (index <= 0) {
         self.goToFirst();
@@ -69,7 +69,7 @@
 
     goToFirst: function () {
       // Go to first blade
-      $('.left', self.options.pagerSelector).hide();
+      $('.left', $(self.options.pagerSelector)).hide();
       this._setActive(0);
       this._setPull(0);
 
@@ -79,7 +79,7 @@
 
     goToLast: function () {
       // Go to last blade
-      $('.right', self.options.pagerSelector).hide();
+      $('.right', $(self.options.pagerSelector)).hide();
       var pull = $(this.options.innerStripSelector).width() - $(this.element[0]).width(),
           index = $(this.options.bladesSelector).length - 1;
 
@@ -179,7 +179,7 @@
       // debounced resizing
       var self = this, t;
 
-      $('button', self.options.pagerSelector).on('click', function (e) {
+      $('button', $(self.options.pagerSelector)).on('click', function (e) {
         e.preventDefault();
 
         var activeIndex = $(self.element[0]).data('activeIndex'),
