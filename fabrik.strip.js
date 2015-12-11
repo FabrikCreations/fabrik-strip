@@ -1,4 +1,4 @@
-/*global imagesLoaded */
+/*global imagesLoaded, jQuery */
 
 /******************************************
  * jQuery FitFrame
@@ -69,7 +69,7 @@
 
     goToFirst: function () {
       // Go to first blade
-      $('.left', $(self.options.pagerSelector)).hide();
+      $('.left', $(this.options.pagerSelector)).hide();
       this._setActive(0);
       this._setPull(0);
 
@@ -79,7 +79,7 @@
 
     goToLast: function () {
       // Go to last blade
-      $('.right', $(self.options.pagerSelector)).hide();
+      $('.right', $(this.options.pagerSelector)).hide();
       var pull = $(this.options.innerStripSelector).width() - $(this.element[0]).width(),
           index = $(this.options.bladesSelector).length - 1;
 
@@ -214,19 +214,21 @@
       });
 
       $(document.documentElement).keyup(function (event) {
+        var activeIndex = 0,
+            index = 0;
 
         // handle cursor keys
         if (event.keyCode == 37) {
           // go left
-          var activeIndex = $(self.element[0]).data('activeIndex'),
-              index = activeIndex - 1;
+          activeIndex = $(self.element[0]).data('activeIndex');
+          index = activeIndex - 1;
 
           self.options.beforeChange(activeIndex);
           self.goTo(index);
         } else if (event.keyCode == 39) {
           // go right
-          var activeIndex = $(self.element[0]).data('activeIndex'),
-              index = activeIndex + 1;
+          activeIndex = $(self.element[0]).data('activeIndex');
+          index = activeIndex + 1;
 
           self.options.beforeChange(activeIndex);
           self.goTo(index);
