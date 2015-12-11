@@ -73,10 +73,6 @@
 	filter: alpha(opacity=0);
 }
 
-.blade.link.active:after {
-	display: none;
-}
-
 .blade img {
 	display: block;
 	height: 100%;
