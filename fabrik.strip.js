@@ -109,6 +109,7 @@
 
       $(self.element[0]).height(windowHeight);
       $(self.options.bladesSelector).removeAttr('style');
+      $(self.options.innerStripSelector).width('999em');
 
       // after images are loaded get the widths of the blades so we can set parent container
 
@@ -210,7 +211,7 @@
           // On resize set the sizes
           self._setSizes();
           self._goToOnResize($(self.element[0]).data('activeIndex'));
-        }, 100);
+        }, 200);
       });
 
       $(document.documentElement).keyup(function (event) {
