@@ -107,7 +107,7 @@
         windowHeight -= $(self.options.headerSelector).height();
       }
 
-      $(self.element[0]).height(windowHeight);
+      $(self.element[0]).css({'height':windowHeight, 'max-height': windowHeight});
       $(self.options.bladesSelector).removeAttr('style');
       $(self.options.innerStripSelector).width('999em');
 
