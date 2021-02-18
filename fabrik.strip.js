@@ -159,25 +159,41 @@
 
           //var howManyToLoad = images.length + videos.length;
 
-          var imagesAreLoaded = function () {
+          //var imagesAreLoaded = function () {
 
               var width = 0;
 
               $(self.options.bladesSelector).each(function () {
 
                   var $blade = $(this),
-                      bladewidth = $(this).width(),
-                      $img = $('img', $blade),
-                      $video = $('video', $blade);
+                  $img = $('img', $blade),
+                  $video = $('video', $blade),
+                  bladewidth = $(this).width();
 
                   if ($img.length) {
+                    if($img[0].complete) {
                       bladewidth = $img.width();
                       $blade.data('width', bladewidth).data('height', $img.height());
+                    }
+                    else {
+                      $img[0].addEventListener('load', function() {
+                        bladewidth = $img.width();
+                        $blade.data('width', bladewidth).data('height', $img.height());
+                      }, true)
+                    }  
                   }
 
                   if ($video.length) {
+                    if($video[0].complete) {
                       bladewidth = $video.width();
                       $blade.data('width', bladewidth).data('height', $video.height());
+                    }
+                    else {
+                      $video[0].addEventListener('loadeddata', function() {
+                        bladewidth = $video.width();
+                        $blade.data('width', bladewidth).data('height', $video.height());
+                      }, true)
+                    }  
                   }
 
                   // limit blade width
@@ -189,11 +205,11 @@
 
               $(self.options.innerStripSelector).width(width).addClass('blades-loaded');
 
-          };
+          //};
 
          
-          container.addEventListener('load', imagesAreLoaded, true);
-          container.addEventListener('loadeddata', imagesAreLoaded, true);
+          //container.addEventListener('load', imagesAreLoaded, true);
+          //container.addEventListener('loadeddata', imagesAreLoaded, true);
 
           // if (imagesLoaded !== undefined) {
           //   imagesLoaded(self.element[0], function () {
