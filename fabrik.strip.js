@@ -139,7 +139,7 @@
       var container = self.element[0];
 
       container.addEventListener('load', update, true);
-      container.addEventListener('loadeddata', update, true);
+      //container.addEventListener('loadeddata', update, true);
 
 
 
