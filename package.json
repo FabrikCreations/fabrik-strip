@@ -1,0 +1,19 @@
+{
+  "name": "fabrik-strip",
+  "version": "1.0.1",
+  "description": "layout plugin",
+  "main": "fabrik.strip.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phil118/fabrik-strip.git"
+  },
+  "author": "Fabrik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phil118/fabrik-strip/issues"
+  },
+  "homepage": "https://github.com/phil118/fabrik-strip#readme"
+}
