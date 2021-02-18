@@ -113,9 +113,10 @@
 
       // after images are loaded get the widths of the blades so we can set parent container
 
-      if (imagesLoaded !== undefined) {
-        imagesLoaded(self.element[0], function () {
-          var width = 0;
+
+      var update = function () {
+
+        var width = 0;
 
           $(self.options.bladesSelector).each(function () {
 
@@ -132,11 +133,41 @@
           });
 
           $(self.options.innerStripSelector).width(width).addClass('blades-loaded');
-        });
-      }
-      else {
-        console.info("You need to add images Loaded plugin http://imagesloaded.desandro.com/");
-      }
+      
+      };
+
+      var container = self.element[0];
+
+      container.addEventListener('load', update, true);
+      container.addEventListener('loadeddata', update, true);
+
+
+
+
+      // if (imagesLoaded !== undefined) {
+      //   imagesLoaded(self.element[0], function () {
+      //     var width = 0;
+
+      //     $(self.options.bladesSelector).each(function () {
+
+      //       var $blade = $(this),
+      //           bladewidth = $(this).width(),
+      //           $img = $('img', $blade);
+
+      //       if ($img.length) {
+      //         bladewidth = $img.width();
+      //       }
+
+      //       $blade.width(bladewidth);
+      //       width += bladewidth;
+      //     });
+
+      //     $(self.options.innerStripSelector).width(width).addClass('blades-loaded');
+      //   });
+      // }
+      // else {
+      //   console.info("You need to add images Loaded plugin http://imagesloaded.desandro.com/");
+      // }
 
       var pagerWidth = $('.left').outerWidth(true),
           infoWidth = windowWidth - pagerWidth;
