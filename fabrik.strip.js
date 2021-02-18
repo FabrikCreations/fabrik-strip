@@ -151,90 +151,37 @@
           $(self.options.innerStripSelector).width('999em');
 
           // after images are loaded get the widths of the blades so we can set parent container
-
-          var container = self.element[0];
-
-          //var images = container.getElementsByTagName("img");
-          //var videos = container.getElementsByTagName("video");
-
-          //var howManyToLoad = images.length + videos.length;
-
-          //var imagesAreLoaded = function () {
-
+          if (imagesLoaded !== undefined) {
+            imagesLoaded(self.element[0], function () {
               var width = 0;
 
               $(self.options.bladesSelector).each(function () {
 
-                  var $blade = $(this),
-                  $img = $('img', $blade),
-                  $video = $('video', $blade),
-                  bladewidth = $(this).width();
+                var $blade = $(this),
+                    bladewidth = $(this).width(),
+                    $img = $('img', $blade),
+                    $video = $('video', $blade);
 
-                  if ($img.length) {
-                    if($img[0].complete) {
-                      bladewidth = $img.width();
-                      $blade.data('width', bladewidth).data('height', $img.height());
-                    }
-                    else {
-                      $img[0].addEventListener('load', function() {
-                        bladewidth = $img.width();
-                        $blade.data('width', bladewidth).data('height', $img.height());
-                      }, true)
-                    }  
-                  }
+                if ($img.length) {
+                  bladewidth = $img.width();
+                  $blade.data('width', bladewidth).data('height', $img.height());
+                }
 
-                  if ($video.length) {
-                    if($video[0].complete) {
-                      bladewidth = $video.width();
-                      $blade.data('width', bladewidth).data('height', $video.height());
-                    }
-                    else {
-                      $video[0].addEventListener('loadeddata', function() {
-                        bladewidth = $video.width();
-                        $blade.data('width', bladewidth).data('height', $video.height());
-                      }, true)
-                    }  
-                  }
+                if ($video.length) {
+                  bladewidth = $video.width();
+                  $blade.data('width', bladewidth).data('height', $video.height());
+                }
 
-                  // limit blade width
-                  $blade.width(bladewidth);
-
-                  // limit total width
-                  width += bladewidth;
+                $blade.width(bladewidth);
+                width += bladewidth;
               });
 
               $(self.options.innerStripSelector).width(width).addClass('blades-loaded');
-
-          //};
-
-         
-          //container.addEventListener('load', imagesAreLoaded, true);
-          //container.addEventListener('loadeddata', imagesAreLoaded, true);
-
-          // if (imagesLoaded !== undefined) {
-          //   imagesLoaded(self.element[0], function () {
-          //     var width = 0;
-
-          //     $(self.options.bladesSelector).each(function () {
-
-          //       var $blade = $(this),
-          //           bladewidth = $(this).width(),
-          //           $img = $('img', $blade);
-
-          //       if ($img.length) {
-          //         bladewidth = $img.width();
-          //       }
-
-          //       $blade.width(bladewidth);
-          //       width += bladewidth;
-          //     });
-
-          //     $(self.options.innerStripSelector).width(width).addClass('blades-loaded');
-          //   });
-          // }
-          // else {
-          //   console.info("You need to add images Loaded plugin http://imagesloaded.desandro.com/");
-          // }
+            });
+          }
+          else {
+            console.info("You need to add images Loaded plugin http://imagesloaded.desandro.com/");
+          }
 
           var pagerWidth = $('.left').outerWidth(true),
               infoWidth = windowWidth - pagerWidth;
