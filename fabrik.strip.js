@@ -1,7 +1,7 @@
 /*global imagesLoaded, jQuery */
 
 /******************************************
- * jQuery FitFrame
+ * jQuery FabrikStrip
  *
  * A lightweight, easy-to-use jQuery plugin for responsive slide layout.
  *
@@ -192,7 +192,7 @@
           };
 
          
-          //container.addEventListener('load', update, true);
+          container.addEventListener('load', imagesAreLoaded, true);
           container.addEventListener('loadeddata', imagesAreLoaded, true);
 
           // if (imagesLoaded !== undefined) {
