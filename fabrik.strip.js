@@ -123,20 +123,23 @@
   
               document.querySelectorAll(self.options.bladesSelector).forEach(function(blade) {
   
-                  var bladeWidth = blade.dataset.width;
+                  var bladeWidth = parseInt(blade.dataset.width);
   
-                  if (bladeWidth) {
+                  if (bladeWidth && blade.dataset.media) {
                       bladeWidth = bladeWidth * (1 + heightChangeFactor);
-                  
-                      // limit blade width
                       blade.style.width = `${bladeWidth}px`;
+                  }
+                  else if (bladeWidth) {
+                    blade.style.width = `${bladeWidth}px`;
                   }
   
                 // limit total width
-                totalWidth += bladeWidth;
+                totalWidth = totalWidth + bladeWidth;
             });
-  
-            document.querySelector(self.options.innerStripSelector).style.width = `${totalWidth}`;
+            
+            setTimeout(function() {
+                document.querySelector(self.options.innerStripSelector).style.width = `${totalWidth}px`;
+            },200);
         },
   
         _setSizes: function () {
@@ -173,20 +176,22 @@
                   var bladewidth = blade.offsetWidth,
                       img = blade.querySelector('img'),
                       video = blade.querySelector('video');
-  
-                  if (img) {
+
+                if (img) {
+                    blade.dataset.media = true;
                     bladewidth = img.offsetWidth;
-                    blade.dataset.width = img.offsetWidth;
                     blade.dataset.height = img.offsetHeight;
-                  }
-  
-                  if (video) {
-                    bladewidth = video.offsetWidth;
-                    blade.dataset.width = video.offsetWidth;
+                }
+
+                if (video) {
+                    blade.dataset.media = true;
+                    bladewidth = video.offsetWidth;                    
                     blade.dataset.height = video.offsetHeight;
-                  }
+                }
+                    
   
                   blade.style.width = `${bladewidth}px`;
+                  blade.dataset.width = parseInt(bladewidth);
                   width += bladewidth;
                 });
   
