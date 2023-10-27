@@ -45,16 +45,13 @@
                 var beforeWidth = 0;
 
                 blades.forEach((blade) => {
-
                     if (self.element[0].indexOf(blade) < index) {
                         beforeWidth += blade.offsetWidth;
                     }
-                    
                 });
 
                 // $(self.options.bladesSelector).each(function () {
                 //     var $blade = $(this);
-
                 //     if ($blade.index() < index) {
                 //         beforeWidth += $blade.width();
                 //     }
