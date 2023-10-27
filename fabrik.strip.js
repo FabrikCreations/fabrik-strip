@@ -14,78 +14,85 @@
 
 (function ($, window, undefined) {
     var PLUGIN_NAME = "fabrikStrip",
-        INSTANCE_KEY = "plugin_" + PLUGIN_NAME;
+        INSTANCE_KEY = "plugin_" + PLUGIN_NAME,
+        BLADES;
 
     function FabrikStrip(element, options, defaults) {
-        this.element = $(element);
-        this.options = $.extend({}, defaults, options);
+
+        this.options = Object.assign({}, defaults, options);
         this._defaults = defaults;
+
+        this.strip = element;
+        this.stripInner = document.querySelector(this.options.innerStripSelector);
+        
+        this.buttons = document.querySelectorAll(this.options.pagerSelector + " button");
+        this.buttonNext = document.querySelector(this.options.pagerSelector + " .right");
+        this.buttonPrev = document.querySelector(this.options.pagerSelector + " .left");
+
         this._init();
     }
 
     FabrikStrip.prototype = {
         goTo: function (index) {
+
             // Go to specific blade
+            var self = this;
 
-            var self = this,
-                blades = document.querySelectorAll(self.options.bladesSelector),
-                bladesCount = blades.length;
-
-            if (index > bladesCount - 1) {
+            if (index > BLADES.length - 1) {
                 return;
             }
 
-            $("button", $(self.options.pagerSelector)).show();
+            self.buttons.forEach(function(button) {
+                button.style.display = "block";
+            });
 
             if (index <= 0) {
                 self.goToFirst();
-            } else if (index >= bladesCount - 1) {
+            } else if (index >= BLADES.length - 1) {
                 self.goToLast();
             } else {
                 var beforeWidth = 0;
 
-                blades.forEach((blade) => {
-                    if (self.element[0].indexOf(blade) < index) {
+                BLADES.forEach((blade, bladeIndex) => {
+                    if (bladeIndex < index) {
                         beforeWidth += blade.offsetWidth;
                     }
                 });
 
-                // $(self.options.bladesSelector).each(function () {
-                //     var $blade = $(this);
-                //     if ($blade.index() < index) {
-                //         beforeWidth += $blade.width();
-                //     }
-                // });
-
-                var viewableWidth = self.element[0].offsetWidth,
-                    halfView = (viewableWidth - blades[index].offsetWidth) /  2,
+                var viewableWidth = self.strip.offsetWidth,
+                    halfView = (viewableWidth - BLADES[index].offsetWidth) /  2,
                     pull = beforeWidth - halfView;
+
+                const maxPull = self.stripInner.offsetWidth - viewableWidth;
+
+                if (pull > maxPull) {
+                    pull = maxPull;
+                }
 
                 this._setActive(index);
                 this._setPull(-pull);
-
                 this.options.afterChange(index);
+
                 return index;
             }
         },
 
         goToFirst: function () {
             // Go to first blade
-            $(".left", $(this.options.pagerSelector)).hide();
+            this.buttonPrev.style.display = "none";
             this._setActive(0);
             this._setPull(0);
-
             this.options.afterChange(0);
+
             return 0;
         },
 
         goToLast: function () {
             // Go to last blade
-            $(".right", $(this.options.pagerSelector)).hide();
-            var pull =
-                    $(this.options.innerStripSelector).width() -
-                    $(this.element[0]).width(),
-                index = $(this.options.bladesSelector).length - 1;
+            this.buttonNext.style.display = "none";
+
+            const pull = this.stripInner.offsetWidth - this.strip.offsetWidth,
+                index = BLADES.length - 1;
 
             this._setActive(index);
             this._setPull(-pull);
@@ -96,6 +103,7 @@
 
         _init: function () {
             document.documentElement.classList.add("fabrik-strip");
+            BLADES = document.querySelectorAll(this.options.bladesSelector);
             this._bind();
             this._setSizes();
             this._setActive(this.options.startIndex);
@@ -106,28 +114,25 @@
             var h = window.innerHeight;
             var w = window.innerWidth;
 
-            var originalWindowHeight = self.element[0].dataset.height;
+            var originalWindowHeight = self.strip.dataset.height;
 
-            var heightChangeFactor =
-                (h - originalWindowHeight) / originalWindowHeight;
+            var heightChangeFactor = (h - originalWindowHeight) / originalWindowHeight;
 
-            self.element[0].dataset.height = h;
-            self.element[0].dataset.width = w;
+            self.strip.dataset.height = h;
+            self.strip.dataset.width = w;
 
-            self.element[0].style.height = `${h}px`;
-            self.element[0].style.maxHeight = `${h}px`;
+            self.strip.style.height = `${h}px`;
+            self.strip.style.maxHeight = `${h}px`;
 
-            let blades = document.querySelectorAll(self.options.bladesSelector);
-
-            blades.forEach((blade) => {
+            BLADES.forEach((blade) => {
                 blade.removeAttribute("style");
             });
 
-            document.querySelector(self.options.innerStripSelector).style.width = "30000px";
+            self.stripInner.style.width = "30000px";
 
             var totalWidth = 0;
 
-            blades.forEach((blade) => {
+            BLADES.forEach((blade) => {
                 var bladeWidth = parseInt(blade.dataset.width);
 
                 if (bladeWidth && blade.dataset.media) {
@@ -142,7 +147,7 @@
             });
 
             setTimeout(function () {
-                document.querySelector(self.options.innerStripSelector).style.width = `${totalWidth}px`;
+                self.stripInner.style.width = `${totalWidth}px`;
             }, 200);
         },
 
@@ -155,20 +160,17 @@
                 windowHeight -= $(self.options.headerSelector).height();
             }
 
-            self.element[0].dataset.height = windowHeight;
-            self.element[0].dataset.width = windowWidth;
+            self.strip.dataset.height = windowHeight;
+            self.strip.dataset.width = windowWidth;
 
-            self.element[0].style.height = `${windowHeight}px`;
-            self.element[0].style.maxHeight = `${windowHeight}px`;
+            self.strip.style.height = `${windowHeight}px`;
+            self.strip.style.maxHeight = `${windowHeight}px`;
 
-            document
-                .querySelectorAll(self.options.bladesSelector)
-                .forEach(function (blade) {
-                    blade.removeAttribute("style");
-                });
+            BLADES.forEach((blade) => {
+                blade.removeAttribute("style");
+            });
 
-            let inner = document.querySelector(self.options.innerStripSelector);
-            inner.style.width = "30000px";
+            self.stripInner.style.width = "30000px";
 
             let width = 0;
 
@@ -179,7 +181,7 @@
             // after images are loaded get the widths of the blades so we can set parent container
             if (imagesLoaded !== undefined) {
 
-                var imgLoad = imagesLoaded(self.element[0]);
+                var imgLoad = imagesLoaded(self.strip);
                 
                 imgLoad.on("progress", function (instance, image) 
                 {
@@ -192,6 +194,7 @@
 
                     if (!image.isLoaded) {
                         parentBlade.remove();
+                        BLADES = document.querySelectorAll(this.options.bladesSelector);
                     }
                     else {
 
@@ -202,40 +205,9 @@
 
                         width += img.offsetWidth;
                         
-                        //inner.style.width = `${width}px`;
                         parentBlade.classList.add("blade-loaded");
                     }
                 });
-
-                // imagesLoaded(self.element[0], function () {
-                //     let width = 0;
-
-                //     document.querySelectorAll(self.options.bladesSelector).forEach(function (blade) {
-                //         let bladewidth = blade.offsetWidth,
-                //             img = blade.querySelector("img"),
-                //             video = blade.querySelector("video");
-
-                //         if (img) {
-                //             blade.dataset.media = true;
-                //             bladewidth = img.offsetWidth;
-                //             blade.dataset.height = img.offsetHeight;
-                //         }
-
-                //         if (video) {
-                //             blade.dataset.media = true;
-                //             bladewidth = video.offsetWidth;
-                //             blade.dataset.height = video.offsetHeight;
-                //         }
-
-                //         blade.style.width = `${bladewidth}px`;
-                //         blade.dataset.width = parseInt(bladewidth);
-                //         width += bladewidth;
-                //     });
-
-                //     let inner = document.querySelector(self.options.innerStripSelector);
-                //     inner.style.width = `${width}px`;
-                //     inner.classList.add("blades-loaded");
-                // });
             } 
             else {
                 console.info(
@@ -251,14 +223,16 @@
 
             if (videosCount) {
 
-                videos.forEach(function (video) {
+                videos.forEach((video) => {
 
                     const videoParentBlade = video.closest(self.options.bladesSelector);
 
                     video.addEventListener('error', (e) => {
                         console.log("video is broken for " + e.target.attributes.src.value);
                         videosCount--;
+
                         videoParentBlade.remove();
+                        BLADES = document.querySelectorAll(this.options.bladesSelector);
                     }, true);
 
                     video.addEventListener('loadeddata', (e) => {
@@ -272,7 +246,6 @@
 
                         width += video.offsetWidth;
 
-                        //inner.style.width = `${width}px`;
                         videoParentBlade.classList.add("blade-loaded");
 
                         loadedVideosCount++;
@@ -280,11 +253,11 @@
                 });
             }
 
-            var pagerWidth = $(".left").outerWidth(true),
+            var pagerWidth = self.buttonNext.offsetWidth,
                 infoWidth = windowWidth - pagerWidth;
 
             if (windowWidth >= 1200) {
-                infoWidth = self.element[0].offsetWidth / 2;
+                infoWidth = self.strip.offsetWidth / 2;
             }
 
             const infoBlade = document.querySelector(".project-info-blade");
@@ -304,48 +277,52 @@
             else if (images.length) {
                 imgLoad.on('always', () => {
                     console.log('total width images', width);
-                    inner.style.width = `${width}px`;
+                    self.stripInner.style.width = `${width}px`;
                 });
             }
             else if (videosCount) {
                 checkVideosLoaded();
             }
             else {
-                inner.style.width = `${width}px`;
+                self.stripInner.style.width = `${width}px`;
             }
 
             function checkVideosLoaded() {
-                console.log('checking videos loaded')
+                console.log('checking videos loaded');
+
                 const intervalId = setInterval(() => {
 
                     console.log('video count', videosCount, 'loaded video count', loadedVideosCount);
 
                     if (videosCount === loadedVideosCount) {
                         clearInterval(intervalId); // Stop the interval if the numbers match
-                        inner.style.width = `${width}px`;
+                        self.stripInner.style.width = `${width}px`;
                         console.log('total width with videos', width);
                     }
-                }, 100);
+                }, 150);
+
+                setTimeout(() => {
+                    clearInterval(intervalId);
+                }, 5000);
             }
         },
 
         _setPull: function (int) {
-            $(this.options.innerStripSelector).css({
-                "-webkit-transform": "translate3d(" + int + "px, 0px, 0px)",
-                "-moz-transform": "translate3d(" + int + "px, 0px, 0px)",
-                "-ms-transform": "translate3d(" + int + "px, 0px, 0px)",
-                "-o-transform": "translate3d(" + int + "px, 0px, 0px)",
-                transform: "translate3d(" + int + "px, 0px, 0px)",
-            });
+            this.stripInner.style.webkitTransform = `translate3d(${int}px, 0px, 0px)`;
+            this.stripInner.style.MozTransform = `translate3d(${int}px, 0px, 0px)`;
+            this.stripInner.style.msTransform = `translate3d(${int}px, 0px, 0px)`;
+            this.stripInner.style.oTransform = `translate3d(${int}px, 0px, 0px)`;
+            this.stripInner.style.transform = `translate3d(${int}px, 0px, 0px)`;
         },
 
         _setActive: function (index) {
-            $(this.options.bladesSelector).removeClass("active");
-            // Get the new active blade
-            var $blade = $(this.options.bladesSelector).eq(index);
-            $blade.addClass("active");
 
-            $(this.element[0]).data("activeIndex", index);
+            BLADES.forEach(blade => {
+                blade.classList.remove("active");
+            });
+
+            BLADES[index].classList.add("active");
+            this.strip.dataset.activeIndex = index;
         },
 
         _goToOnResize: function (index) {
@@ -361,58 +338,60 @@
             var self = this,
                 t;
 
-            $("button", $(self.options.pagerSelector)).on(
-                "click",
-                function (e) {
+            self.buttons.forEach((button) => {
+
+                button.addEventListener('click', (e) => {
                     e.preventDefault();
 
-                    var activeIndex = $(self.element[0]).data("activeIndex"),
+                    var activeIndex = parseInt(self.strip.getAttribute("data-active-index")),
                         index = activeIndex + 1;
 
-                    if ($(this).hasClass("left")) {
+                    if (button.classList.contains('left')) {
                         index = activeIndex - 1;
                     }
 
                     self.options.beforeChange(activeIndex);
 
                     self.goTo(index);
-                }
-            );
-
-            $(self.options.bladesSelector).on("click", function (e) {
-                if (!$(this).hasClass("active")) {
-                    e.preventDefault();
-                    var activeIndex = $(self.element[0]).data("activeIndex");
-                    self.options.beforeChange(activeIndex);
-                    self.goTo($(this).index());
-                }
+                });
             });
 
-            var t;
-            $(window).on("resize." + PLUGIN_NAME, function () {
+            BLADES.forEach((blade, bladeIndex) => {
+                blade.addEventListener('click', (e) => {
+                    if (!blade.classList.contains('active')) {
+                        e.preventDefault();
+                        var activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
+                        self.options.beforeChange(activeIndex);
+                        self.goTo(bladeIndex);
+                    }
+                });
+            });
+
+            window.addEventListener("resize", () => {
                 clearTimeout(t);
                 t = setTimeout(function () {
                     // On resize set the sizes
                     self._windowResize();
-                    self._goToOnResize($(self.element[0]).data("activeIndex"));
+                    self._goToOnResize(parseInt(self.strip.getAttribute("data-active-index")));
                 }, 200);
             });
 
-            $(document.documentElement).on("keydown", function (event) {
+            document.documentElement.addEventListener("keydown", (event) => {
+
                 var activeIndex = 0,
                     index = 0;
 
                 // handle cursor keys
-                if (event.which == 37) {
-                    // go left
-                    activeIndex = $(self.element[0]).data("activeIndex");
+                if (event.key == 37) {
+                    // go prev
+                    activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
                     index = activeIndex - 1;
 
                     self.options.beforeChange(activeIndex);
                     self.goTo(index);
-                } else if (event.which == 39) {
-                    // go right
-                    activeIndex = $(self.element[0]).data("activeIndex");
+                } else if (event.key == 39) {
+                    // go next
+                    activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
                     index = activeIndex + 1;
 
                     self.options.beforeChange(activeIndex);
@@ -434,26 +413,14 @@
                 if (typeof options === "string" && options[0] !== "_") {
                     var method = instance[options];
                     if (typeof method === "function") {
-                        returns = method.apply(
-                            instance,
-                            Array.prototype.slice.call(args, 1)
-                        );
+                        returns = method.apply(instance,Array.prototype.slice.call(args, 1));
                     } else {
                         // method missing
-                        $.error(
-                            "Public method '" +
-                                options +
-                                "' does not exist on jQuery." +
-                                PLUGIN_NAME
-                        );
+                        $.error("Public method '" + options + "' does not exist on jQuery." + PLUGIN_NAME);
                     }
                 }
             } else {
-                $.data(
-                    this,
-                    INSTANCE_KEY,
-                    new FabrikStrip(this, options, $.fn[PLUGIN_NAME].defaults)
-                );
+                $.data(this,INSTANCE_KEY,new FabrikStrip(this, options, $.fn[PLUGIN_NAME].defaults));
             }
         });
 
