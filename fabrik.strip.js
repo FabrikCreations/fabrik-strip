@@ -188,7 +188,8 @@
 
                     console.log("image is " + result + " for " + image.img.src);
 
-                    const parentBlade = image.closest(self.options.bladesSelector);
+                    const img = image.img;
+                    const parentBlade = img.closest(self.options.bladesSelector);
 
                     if (!image.isLoaded) {
                         parentBlade.style.display = 'none';
@@ -201,8 +202,9 @@
                         parentBlade.style.width = `${img.offsetWidth}px`;
 
                         width += img.offsetWidth;
-
+                        
                         inner.style.width = `${width}px`;
+                        parentBlade.classList.add("blade-loaded");
                     }
                 });
 
@@ -258,6 +260,7 @@
                         width += video.offsetWidth;
 
                         inner.style.width = `${width}px`;
+                        videoParentBlade.classList.add("blade-loaded");
                     });
                 });
             }
@@ -269,7 +272,9 @@
                 infoWidth = self.element[0].offsetWidth / 2;
             }
 
-            document.querySelector(".project-info-blade").style.width = `${infoWidth}px`;
+            const infoBlade = document.querySelector(".project-info-blade");
+            infoBlade.style.width = `${infoWidth}px`;
+            infoBlade.classList.add("blade-loaded");
 
             width += infoWidth;
             inner.style.width = `${width}px`;
