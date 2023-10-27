@@ -248,7 +248,7 @@
                 videos.forEach(function (video) {
                     video.addEventListener('loadeddata', () => {
                         
-                        const videoParentBlade = image.closest(self.options.bladesSelector);
+                        const videoParentBlade = video.closest(self.options.bladesSelector);
 
                         videoParentBlade.dataset.media = true;
                         videoParentBlade.dataset.height = video.offsetHeight;
