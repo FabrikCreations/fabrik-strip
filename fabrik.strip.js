@@ -28,7 +28,8 @@
             // Go to specific blade
 
             var self = this,
-                bladesCount = $(self.options.bladesSelector).length;
+                blades = document.querySelectorAll(self.options.bladesSelector),
+                bladesCount = blades.length;
 
             if (index > bladesCount - 1) {
                 return;
@@ -43,19 +44,24 @@
             } else {
                 var beforeWidth = 0;
 
-                $(self.options.bladesSelector).each(function () {
-                    var $blade = $(this);
+                blades.forEach((blade) => {
 
-                    if ($blade.index() < index) {
-                        beforeWidth += $blade.width();
+                    if (self.element[0].indexOf(blade) < index) {
+                        beforeWidth += blade.offsetWidth;
                     }
+                    
                 });
 
-                var viewableWidth = $(self.element[0]).width(),
-                    halfView =
-                        (viewableWidth -
-                            $(self.options.bladesSelector).eq(index).width()) /
-                        2,
+                // $(self.options.bladesSelector).each(function () {
+                //     var $blade = $(this);
+
+                //     if ($blade.index() < index) {
+                //         beforeWidth += $blade.width();
+                //     }
+                // });
+
+                var viewableWidth = self.element[0].offsetWidth,
+                    halfView = (viewableWidth - blades[index].offsetWidth) /  2,
                     pull = beforeWidth - halfView;
 
                 this._setActive(index);
@@ -114,38 +120,32 @@
             self.element[0].style.height = `${h}px`;
             self.element[0].style.maxHeight = `${h}px`;
 
-            document
-                .querySelectorAll(self.options.bladesSelector)
-                .forEach(function (blade) {
-                    blade.removeAttribute("style");
-                });
+            let blades = document.querySelectorAll(self.options.bladesSelector);
 
-            document.querySelector(
-                self.options.innerStripSelector
-            ).style.width = "999em";
+            blades.forEach((blade) => {
+                blade.removeAttribute("style");
+            });
+
+            document.querySelector(self.options.innerStripSelector).style.width = "30000px";
 
             var totalWidth = 0;
 
-            document
-                .querySelectorAll(self.options.bladesSelector)
-                .forEach(function (blade) {
-                    var bladeWidth = parseInt(blade.dataset.width);
+            blades.forEach((blade) => {
+                var bladeWidth = parseInt(blade.dataset.width);
 
-                    if (bladeWidth && blade.dataset.media) {
-                        bladeWidth = bladeWidth * (1 + heightChangeFactor);
-                        blade.style.width = `${bladeWidth}px`;
-                    } else if (bladeWidth) {
-                        blade.style.width = `${bladeWidth}px`;
-                    }
+                if (bladeWidth && blade.dataset.media) {
+                    bladeWidth = bladeWidth * (1 + heightChangeFactor);
+                    blade.style.width = `${bladeWidth}px`;
+                } else if (bladeWidth) {
+                    blade.style.width = `${bladeWidth}px`;
+                }
 
-                    // limit total width
-                    totalWidth = totalWidth + bladeWidth;
-                });
+                // limit total width
+                totalWidth = totalWidth + bladeWidth;
+            });
 
             setTimeout(function () {
-                document.querySelector(
-                    self.options.innerStripSelector
-                ).style.width = `${totalWidth}px`;
+                document.querySelector(self.options.innerStripSelector).style.width = `${totalWidth}px`;
             }, 200);
         },
 
@@ -170,12 +170,14 @@
                     blade.removeAttribute("style");
                 });
 
-            document.querySelector(
-                self.options.innerStripSelector
-            ).style.width = "999em";
+            let inner = document.querySelector(self.options.innerStripSelector);
+            inner.style.width = "30000px";
 
             let width = 0;
-            let inner = document.querySelector(self.options.innerStripSelector);
+
+            const images = document.querySelectorAll(`${self.options.bladesSelector} img`);
+
+            console.log('image count', images.length);
 
             // after images are loaded get the widths of the blades so we can set parent container
             if (imagesLoaded !== undefined) {
@@ -192,7 +194,7 @@
                     const parentBlade = img.closest(self.options.bladesSelector);
 
                     if (!image.isLoaded) {
-                        parentBlade.style.display = 'none';
+                        parentBlade.remove();
                     }
                     else {
 
@@ -203,7 +205,7 @@
 
                         width += img.offsetWidth;
                         
-                        inner.style.width = `${width}px`;
+                        //inner.style.width = `${width}px`;
                         parentBlade.classList.add("blade-loaded");
                     }
                 });
@@ -245,12 +247,26 @@
             }
 
             const videos = document.querySelectorAll(`${self.options.bladesSelector} video`);
+            let videosCount = videos.length;
+            let loadedVideosCount = 0;
 
-            if (videos.length) {
+            console.log('video count', videosCount);
+
+            if (videosCount) {
+
                 videos.forEach(function (video) {
-                    video.addEventListener('loadeddata', () => {
-                        
-                        const videoParentBlade = video.closest(self.options.bladesSelector);
+
+                    const videoParentBlade = video.closest(self.options.bladesSelector);
+
+                    video.addEventListener('error', (e) => {
+                        console.log("video is broken for " + e.target.attributes.src.value);
+                        videosCount--;
+                        videoParentBlade.remove();
+                    }, true);
+
+                    video.addEventListener('loadeddata', (e) => {
+
+                        console.log("video is loaded for " + e.target.currentSrc);
 
                         videoParentBlade.dataset.media = true;
                         videoParentBlade.dataset.height = video.offsetHeight;
@@ -259,8 +275,10 @@
 
                         width += video.offsetWidth;
 
-                        inner.style.width = `${width}px`;
+                        //inner.style.width = `${width}px`;
                         videoParentBlade.classList.add("blade-loaded");
+
+                        loadedVideosCount++;
                     });
                 });
             }
@@ -274,10 +292,44 @@
 
             const infoBlade = document.querySelector(".project-info-blade");
             infoBlade.style.width = `${infoWidth}px`;
+
+            infoBlade.dataset.width = infoBlade.offsetWidth;
             infoBlade.classList.add("blade-loaded");
 
-            width += infoWidth;
-            inner.style.width = `${width}px`;
+            width += infoBlade.offsetWidth;
+
+            if (images.length && videosCount) {                
+                imgLoad.on('always', () => {
+                    console.log('total width images waiting for videos', width);
+                    checkVideosLoaded();
+                });
+            }
+            else if (images.length) {
+                imgLoad.on('always', () => {
+                    console.log('total width images', width);
+                    inner.style.width = `${width}px`;
+                });
+            }
+            else if (videosCount) {
+                checkVideosLoaded();
+            }
+            else {
+                inner.style.width = `${width}px`;
+            }
+
+            function checkVideosLoaded() {
+                console.log('checking videos loaded')
+                const intervalId = setInterval(() => {
+
+                    console.log('video count', videosCount, 'loaded video count', loadedVideosCount);
+
+                    if (videosCount === loadedVideosCount) {
+                        clearInterval(intervalId); // Stop the interval if the numbers match
+                        inner.style.width = `${width}px`;
+                        console.log('total width with videos', width);
+                    }
+                }, 100);
+            }
         },
 
         _setPull: function (int) {
