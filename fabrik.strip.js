@@ -134,9 +134,10 @@
                 if (blade.dataset.media && blade.dataset.widthFactor) {
                     bladeWidth = parseFloat(self.strip.dataset.height) * parseFloat(blade.dataset.widthFactor);
                     blade.style.width = `${bladeWidth}px`;
-                } else if (bladeWidth) {
-                    blade.style.width = `${bladeWidth}px`;
-                }
+                } 
+                // else if (bladeWidth) {
+                //     blade.style.width = `${bladeWidth}px`;
+                // }
 
                 // limit total width
                 totalWidth = totalWidth + bladeWidth;
@@ -188,24 +189,27 @@
                     const img = image.img;
                     const parentBlade = img.closest(self.options.bladesSelector);
 
-                    if (!image.isLoaded) {
-                        parentBlade.remove();
-                        BLADES = document.querySelectorAll(this.options.bladesSelector);
-                    }
-                    else {
-                        const imageHeight = self.strip.offsetHeight;
-                        const widthFactor = img.naturalWidth / img.naturalHeight;
-                        const imageWidth = imageHeight * widthFactor;
-                        
-                        parentBlade.dataset.media = true;
-                        parentBlade.dataset.height = imageHeight;
-                        parentBlade.dataset.width = imageWidth;
-                        parentBlade.dataset.widthFactor = widthFactor;
-                        parentBlade.style.width = `${imageWidth}px`;
+                    if (!parentBlade.classList.contains('project-info-blade')) 
+                    {
+                        if (!image.isLoaded) {
+                            parentBlade.remove();
+                            BLADES = document.querySelectorAll(this.options.bladesSelector);
+                        }
+                        else {
+                            const imageHeight = self.strip.offsetHeight;
+                            const widthFactor = img.naturalWidth / img.naturalHeight;
+                            const imageWidth = imageHeight * widthFactor;
+                            
+                            parentBlade.dataset.media = true;
+                            parentBlade.dataset.height = imageHeight;
+                            parentBlade.dataset.width = imageWidth;
+                            parentBlade.dataset.widthFactor = widthFactor;
+                            parentBlade.style.width = `${imageWidth}px`;
 
-                        width += imageWidth;
-                        
-                        parentBlade.classList.add("blade-loaded");
+                            width += imageWidth;
+                            
+                            parentBlade.classList.add("blade-loaded");
+                        }
                     }
                 });
             } 
@@ -227,34 +231,37 @@
 
                     const videoParentBlade = video.closest(self.options.bladesSelector);
 
-                    video.addEventListener('error', (e) => {
-                        console.log("video is broken for " + e.target.attributes.src.value);
-                        videosCount--;
+                    if (!videoParentBlade.classList.contains('project-info-blade')) 
+                    {
+                        video.addEventListener('error', (e) => {
+                            console.log("video is broken for " + e.target.attributes.src.value);
+                            videosCount--;
 
-                        videoParentBlade.remove();
-                        BLADES = document.querySelectorAll(this.options.bladesSelector);
-                    }, true);
+                            videoParentBlade.remove();
+                            BLADES = document.querySelectorAll(this.options.bladesSelector);
+                        }, true);
 
-                    video.addEventListener('loadeddata', (e) => {
+                        video.addEventListener('loadeddata', (e) => {
 
-                        console.log("video is loaded for " + e.target.currentSrc);
+                            console.log("video is loaded for " + e.target.currentSrc);
 
-                        let videoHeight = self.strip.offsetHeight;
-                        let widthFactor = video.videoWidth / video.videoHeight;
-                        let videoWidth = videoHeight * widthFactor;
+                            let videoHeight = self.strip.offsetHeight;
+                            let widthFactor = video.videoWidth / video.videoHeight;
+                            let videoWidth = videoHeight * widthFactor;
 
-                        videoParentBlade.dataset.media = true;
-                        videoParentBlade.dataset.height = videoWidth;
-                        videoParentBlade.dataset.width = videoWidth;
-                        videoParentBlade.dataset.widthFactor = widthFactor;
-                        videoParentBlade.style.width = `${videoWidth}px`;
+                            videoParentBlade.dataset.media = true;
+                            videoParentBlade.dataset.height = videoWidth;
+                            videoParentBlade.dataset.width = videoWidth;
+                            videoParentBlade.dataset.widthFactor = widthFactor;
+                            videoParentBlade.style.width = `${videoWidth}px`;
 
-                        width += videoWidth;
+                            width += videoWidth;
 
-                        videoParentBlade.classList.add("blade-loaded");
+                            videoParentBlade.classList.add("blade-loaded");
 
-                        loadedVideosCount++;
-                    });
+                            loadedVideosCount++;
+                        });
+                    }
                 });
             }
 
