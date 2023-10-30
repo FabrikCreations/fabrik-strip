@@ -110,13 +110,10 @@
         },
 
         _windowResize: function () {
-            var self = this;
-            var h = window.innerHeight;
-            var w = window.innerWidth;
 
-            var originalWindowHeight = self.strip.dataset.height;
-
-            var heightChangeFactor = (h - originalWindowHeight) / originalWindowHeight;
+            var self = this,
+                h = window.innerHeight,
+                w = window.innerWidth;
 
             self.strip.dataset.height = h;
             self.strip.dataset.width = w;
@@ -133,10 +130,9 @@
             var totalWidth = 0;
 
             BLADES.forEach((blade) => {
-                var bladeWidth = parseInt(blade.dataset.width);
 
-                if (bladeWidth && blade.dataset.media) {
-                    bladeWidth = bladeWidth * (1 + heightChangeFactor);
+                if (blade.dataset.media && blade.dataset.widthFactor) {
+                    bladeWidth = parseFloat(self.strip.dataset.height) * parseFloat(blade.dataset.widthFactor);
                     blade.style.width = `${bladeWidth}px`;
                 } else if (bladeWidth) {
                     blade.style.width = `${bladeWidth}px`;
@@ -197,13 +193,17 @@
                         BLADES = document.querySelectorAll(this.options.bladesSelector);
                     }
                     else {
-
+                        const imageHeight = self.strip.offsetHeight;
+                        const widthFactor = img.naturalWidth / img.naturalHeight;
+                        const imageWidth = imageHeight * widthFactor;
+                        
                         parentBlade.dataset.media = true;
-                        parentBlade.dataset.height = img.offsetHeight;
-                        parentBlade.dataset.width = img.offsetWidth;
-                        parentBlade.style.width = `${img.offsetWidth}px`;
+                        parentBlade.dataset.height = imageHeight;
+                        parentBlade.dataset.width = imageWidth;
+                        parentBlade.dataset.widthFactor = widthFactor;
+                        parentBlade.style.width = `${imageWidth}px`;
 
-                        width += img.offsetWidth;
+                        width += imageWidth;
                         
                         parentBlade.classList.add("blade-loaded");
                     }
@@ -239,12 +239,17 @@
 
                         console.log("video is loaded for " + e.target.currentSrc);
 
-                        videoParentBlade.dataset.media = true;
-                        videoParentBlade.dataset.height = video.offsetHeight;
-                        videoParentBlade.dataset.width = video.offsetWidth;
-                        videoParentBlade.style.width = `${video.offsetWidth}px`;
+                        let videoHeight = self.strip.offsetHeight;
+                        let widthFactor = video.videoWidth / video.videoHeight;
+                        let videoWidth = videoHeight * widthFactor;
 
-                        width += video.offsetWidth;
+                        videoParentBlade.dataset.media = true;
+                        videoParentBlade.dataset.height = videoWidth;
+                        videoParentBlade.dataset.width = videoWidth;
+                        videoParentBlade.dataset.widthFactor = widthFactor;
+                        videoParentBlade.style.width = `${videoWidth}px`;
+
+                        width += videoWidth;
 
                         videoParentBlade.classList.add("blade-loaded");
 
@@ -343,7 +348,9 @@
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
 
-                    var activeIndex = parseInt(self.strip.getAttribute("data-active-index")),
+                    self.strip.dataset
+
+                    var activeIndex = parseInt(self.strip.dataset.activeIndex),
                         index = activeIndex + 1;
 
                     if (button.classList.contains('left')) {
@@ -360,7 +367,7 @@
                 blade.addEventListener('click', (e) => {
                     if (!blade.classList.contains('active')) {
                         e.preventDefault();
-                        var activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
+                        var activeIndex = parseInt(self.strip.dataset.activeIndex);
                         self.options.beforeChange(activeIndex);
                         self.goTo(bladeIndex);
                     }
@@ -372,7 +379,7 @@
                 t = setTimeout(function () {
                     // On resize set the sizes
                     self._windowResize();
-                    self._goToOnResize(parseInt(self.strip.getAttribute("data-active-index")));
+                    self._goToOnResize(parseInt(self.strip.dataset.activeIndex));
                 }, 200);
             });
 
@@ -384,14 +391,14 @@
                 // handle cursor keys
                 if (event.key == 37) {
                     // go prev
-                    activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
+                    activeIndex = parseInt(self.strip.dataset.activeIndex);
                     index = activeIndex - 1;
 
                     self.options.beforeChange(activeIndex);
                     self.goTo(index);
                 } else if (event.key == 39) {
                     // go next
-                    activeIndex = parseInt(self.strip.getAttribute("data-active-index"));
+                    activeIndex = parseInt(self.strip.dataset.activeIndex);
                     index = activeIndex + 1;
 
                     self.options.beforeChange(activeIndex);
