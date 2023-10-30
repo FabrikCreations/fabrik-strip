@@ -196,19 +196,24 @@
                             BLADES = document.querySelectorAll(this.options.bladesSelector);
                         }
                         else {
-                            const imageHeight = self.strip.offsetHeight;
-                            const widthFactor = img.naturalWidth / img.naturalHeight;
-                            const imageWidth = imageHeight * widthFactor;
-                            
-                            parentBlade.dataset.media = true;
-                            parentBlade.dataset.height = imageHeight;
-                            parentBlade.dataset.width = imageWidth;
-                            parentBlade.dataset.widthFactor = widthFactor;
-                            parentBlade.style.width = `${imageWidth}px`;
 
-                            width += imageWidth;
-                            
-                            parentBlade.classList.add("blade-loaded");
+                            setTimeout(() => {
+                                const imageHeight = self.strip.offsetHeight;
+                                const widthFactor = img.naturalWidth / img.naturalHeight;
+                                const imageWidth = imageHeight * widthFactor;
+                                
+                                parentBlade.dataset.media = true;
+                                parentBlade.dataset.height = imageHeight;
+                                parentBlade.dataset.width = imageWidth;
+                                parentBlade.dataset.widthFactor = widthFactor;
+                                parentBlade.style.width = `${imageWidth}px`;
+
+                                width += imageWidth;
+
+                                console.log("width of image", imageWidth, "running total", width)
+                                
+                                parentBlade.classList.add("blade-loaded");
+                            }, 350);
                         }
                     }
                 });
@@ -257,6 +262,8 @@
 
                             width += videoWidth;
 
+                            console.log("width of video", videoWidth, "running total", width)
+
                             videoParentBlade.classList.add("blade-loaded");
 
                             loadedVideosCount++;
@@ -279,17 +286,23 @@
             infoBlade.classList.add("blade-loaded");
 
             width += infoBlade.offsetWidth;
+            console.log("width of info", infoBlade.offsetWidth, "running total", width)
+
 
             if (images.length && videosCount) {                
                 imgLoad.on('always', () => {
-                    console.log('total width images waiting for videos', width);
-                    checkVideosLoaded();
+                    setTimeout(() => {
+                        console.log('total width images waiting for videos', width);
+                        checkVideosLoaded(); 
+                    }, 350);
                 });
             }
             else if (images.length) {
                 imgLoad.on('always', () => {
-                    console.log('total width images', width);
-                    self.stripInner.style.width = `${width}px`;
+                    setTimeout(() => {
+                        console.log('total width images', width);
+                        self.stripInner.style.width = `${width}px`;
+                    }, 350);
                 });
             }
             else if (videosCount) {
