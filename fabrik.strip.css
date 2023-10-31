@@ -1,13 +1,11 @@
 .fabrik-strip {
   height: 100%;
 }
-
 .strip-wrap {
   overflow: hidden;
   height: 100%;
   position: relative;
 }
-
 .strip {
   width: 999em;
   height: 100%;
@@ -17,28 +15,24 @@
   margin: 0;
   padding: 0;
   list-style: none;
-
-	transition: transform 300ms ease;
-	-webkit-transition: transform 300ms ease;
-	-o-transition: transform 300ms ease;
-	-moz-transition: transform 300ms ease;
-
+  -webkit-transition: -webkit-transform;
+  -moz-transition: -moz-transform;
+  -ms-transition: -ms-transform;
+  -o-transition: -o-transform;
+  transition: transform 300ms ease;
+  -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
+  -ms-transform: translate3d(0,0,0);
+  -o-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;
-
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
-  -ms-transform: translate3d(0, 0, 0);
-  -o-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-
   -webkit-perspective: none;
   -moz-perspective: none;
   -ms-perspective: none;
   perspective: none;
 }
-
 .blade {
   height: 100%;
   float: left;
@@ -47,48 +41,50 @@
   padding: 0;
   position: relative;
   opacity: 0;
+  -webkit-transition: -webkit-transform;
+  -moz-transition: -moz-transform;
+  -ms-transition: -ms-transform;
+  -o-transition: -o-transform;
+  transition: transform 300ms ease;
   overflow: hidden;
-	transition: transform 300ms ease;
-	-webkit-transition: transform 300ms ease;
-	-o-transition: transform 300ms ease;
-	-moz-transition: transform 300ms ease;
 }
-
 .blade:after {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background: #b9b9b9;
-	opacity: 0.85;
-	filter: alpha(opacity=85);
-	display: block;
-	content: '';
-	
-	transition: transform 200ms ease;
-	-webkit-transition: transform 200ms ease;
-	-o-transition: transform 200ms ease;
-	-moz-transition: transform 200ms ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #b9b9b9;
+  opacity: 0.85;
+  filter: alpha(opacity=85);
+  display: block;
+  content: '';
+  -webkit-transition: -webkit-transform;
+  -moz-transition: -moz-transform;
+  -ms-transition: -ms-transform;
+  -o-transition: -o-transform;
+  transition: transform 200ms ease;
 }
-
 .blade.active:after {
-	opacity: 0;
-	filter: alpha(opacity=0);
+  opacity: 0;
+  filter: alpha(opacity=0);
 }
-
-.blade img {
-	display: block;
-	height: 100%;
-	width: auto;
-	margin: auto;
+.blade video, .blade img {
+  display: block;
+  height: 100%;
+  width: auto;
+  margin: auto;
+  opacity: 0;
+  -webkit-transition: -webkit-all;
+  -moz-transition: -moz-all;
+  -ms-transition: -ms-all;
+  -o-transition: -o-all;
+  transition: all 300ms ease;
 }
-
 .blade iframe {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
-
-.blades-loaded .blade {
-	opacity: 1;
+img.loaded, video.loaded, .blade.blade-loaded, .blades-loaded .blade {
+  opacity: 1;
 }

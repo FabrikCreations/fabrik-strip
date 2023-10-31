@@ -135,9 +135,6 @@
                     bladeWidth = parseFloat(self.strip.dataset.height) * parseFloat(blade.dataset.widthFactor);
                     blade.style.width = `${bladeWidth}px`;
                 } 
-                // else if (bladeWidth) {
-                //     blade.style.width = `${bladeWidth}px`;
-                // }
 
                 // limit total width
                 totalWidth = totalWidth + bladeWidth;
@@ -171,106 +168,69 @@
 
             let width = 0;
 
-            const images = document.querySelectorAll(`${self.options.bladesSelector} img`);
+            const mediaList = document.querySelectorAll(`${self.options.bladesSelector} > img, ${self.options.bladesSelector} > video, ${self.options.bladesSelector} > .blade-video-link > video, ${self.options.bladesSelector} > .blade-video-link > img`);
+            const stripHeight = self.strip.offsetHeight;
+            let displayedMediaCount = 0;
 
-            console.log('image count', images.length);
+            console.log('media count', mediaList.length);
 
-            // after images are loaded get the widths of the blades so we can set parent container
-            if (imagesLoaded !== undefined) {
+            mediaList.forEach((mediaItem) => {
+                mediaItem.classList.add('loaded');
 
-                var imgLoad = imagesLoaded(self.strip);
-                
-                imgLoad.on("progress", function (instance, image) 
-                {
-                    var result = image.isLoaded ? "loaded" : "broken";
-
-                    console.log("image is " + result + " for " + image.img.src);
-
-                    const img = image.img;
-                    const parentBlade = img.closest(self.options.bladesSelector);
-
-                    if (!parentBlade.classList.contains('project-info-blade')) 
+                mediaItem.addEventListener('transitionend', (event) => {
+                    
+                    if (event.propertyName === "visibility") 
                     {
-                        if (!image.isLoaded) {
-                            parentBlade.remove();
-                            BLADES = document.querySelectorAll(this.options.bladesSelector);
-                        }
-                        else {
+                        setTimeout(() => 
+                        {
+                            const parentBlade = event.target.closest(self.options.bladesSelector);
 
-                            setTimeout(() => {
-                                const imageHeight = self.strip.offsetHeight;
-                                const widthFactor = img.naturalWidth / img.naturalHeight;
-                                const imageWidth = imageHeight * widthFactor;
+                            if (event.target.nodeName === "IMG") 
+                            {
+                                const img = event.target;
+                                const imageWidthFactor = img.naturalWidth / img.naturalHeight;
+                                let imageWidth = stripHeight * imageWidthFactor;
+
+                                if (isNaN(imageWidth)) {
+                                    imageWidth = stripHeight;
+                                }
                                 
                                 parentBlade.dataset.media = true;
-                                parentBlade.dataset.height = imageHeight;
+                                parentBlade.dataset.height = stripHeight;
                                 parentBlade.dataset.width = imageWidth;
-                                parentBlade.dataset.widthFactor = widthFactor;
+                                parentBlade.dataset.widthFactor = imageWidthFactor;
                                 parentBlade.style.width = `${imageWidth}px`;
 
                                 width += imageWidth;
+                                displayedMediaCount++;
 
                                 console.log("width of image", imageWidth, "running total", width)
-                                
-                                parentBlade.classList.add("blade-loaded");
-                            }, 350);
-                        }
+                            }
+                            else if (event.target.nodeName === "VIDEO")
+                            {
+                                const video = event.target;
+                                const videoWidthFactor = video.videoWidth / video.videoHeight;
+                                let videoWidth = stripHeight * videoWidthFactor;
+
+                                if (isNaN(videoWidth)) {
+                                    videoWidth = stripHeight;
+                                }
+
+                                parentBlade.dataset.media = true;
+                                parentBlade.dataset.height = stripHeight;
+                                parentBlade.dataset.width = videoWidth;
+                                parentBlade.dataset.widthFactor = videoWidthFactor;
+                                parentBlade.style.width = `${videoWidth}px`;
+
+                                width += videoWidth;                              
+                                displayedMediaCount++;
+
+                                console.log("width of video", videoWidth, "running total", width)
+                            }
+                        }, 350);
                     }
                 });
-            } 
-            else {
-                console.info(
-                    "You need to add images Loaded plugin http://imagesloaded.desandro.com/"
-                );
-            }
-
-            const videos = document.querySelectorAll(`${self.options.bladesSelector} video`);
-            let videosCount = videos.length;
-            let loadedVideosCount = 0;
-
-            console.log('video count', videosCount);
-
-            if (videosCount) {
-
-                videos.forEach((video) => {
-
-                    const videoParentBlade = video.closest(self.options.bladesSelector);
-
-                    if (!videoParentBlade.classList.contains('project-info-blade')) 
-                    {
-                        video.addEventListener('error', (e) => {
-                            console.log("video is broken for " + e.target.attributes.src.value);
-                            videosCount--;
-
-                            videoParentBlade.remove();
-                            BLADES = document.querySelectorAll(this.options.bladesSelector);
-                        }, true);
-
-                        video.addEventListener('loadeddata', (e) => {
-
-                            console.log("video is loaded for " + e.target.currentSrc);
-
-                            let videoHeight = self.strip.offsetHeight;
-                            let widthFactor = video.videoWidth / video.videoHeight;
-                            let videoWidth = videoHeight * widthFactor;
-
-                            videoParentBlade.dataset.media = true;
-                            videoParentBlade.dataset.height = videoWidth;
-                            videoParentBlade.dataset.width = videoWidth;
-                            videoParentBlade.dataset.widthFactor = widthFactor;
-                            videoParentBlade.style.width = `${videoWidth}px`;
-
-                            width += videoWidth;
-
-                            console.log("width of video", videoWidth, "running total", width)
-
-                            videoParentBlade.classList.add("blade-loaded");
-
-                            loadedVideosCount++;
-                        });
-                    }
-                });
-            }
+            });
 
             var pagerWidth = self.buttonNext.offsetWidth,
                 infoWidth = windowWidth - pagerWidth;
@@ -288,41 +248,24 @@
             width += infoBlade.offsetWidth;
             console.log("width of info", infoBlade.offsetWidth, "running total", width)
 
-
-            if (images.length && videosCount) {                
-                imgLoad.on('always', () => {
-                    setTimeout(() => {
-                        console.log('total width images waiting for videos', width);
-                        checkVideosLoaded(); 
-                    }, 350);
-                });
-            }
-            else if (images.length) {
-                imgLoad.on('always', () => {
-                    setTimeout(() => {
-                        console.log('total width images', width);
-                        self.stripInner.style.width = `${width}px`;
-                    }, 350);
-                });
-            }
-            else if (videosCount) {
-                checkVideosLoaded();
+            if (mediaList.length) {
+                checkMediaLoaded();
             }
             else {
                 self.stripInner.style.width = `${width}px`;
             }
 
-            function checkVideosLoaded() {
-                console.log('checking videos loaded');
+            function checkMediaLoaded() {
+                console.log('checking media loaded');
 
                 const intervalId = setInterval(() => {
 
-                    console.log('video count', videosCount, 'loaded video count', loadedVideosCount);
+                    console.log('media count', mediaList.length, 'displayed media count', displayedMediaCount);
 
-                    if (videosCount === loadedVideosCount) {
+                    if (mediaList.length === displayedMediaCount) {
                         clearInterval(intervalId); // Stop the interval if the numbers match
                         self.stripInner.style.width = `${width}px`;
-                        console.log('total width with videos', width);
+                        console.log('total width with media', width);
                     }
                 }, 150);
 

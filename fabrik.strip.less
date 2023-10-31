@@ -82,11 +82,14 @@
 		filter: alpha(opacity=0);
 	}
 
+	video,
 	img {
 		display: block;
 		height: 100%;
 		width: auto;
 		margin: auto;
+		opacity: 0;
+		.transition(all 300ms ease);
 	}
 
 	iframe {
@@ -95,6 +98,8 @@
 	}
 }
 
+img.loaded,
+video.loaded,
 .blade.blade-loaded,
 .blades-loaded .blade {
 	opacity: 1;
