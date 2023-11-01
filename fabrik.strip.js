@@ -181,9 +181,6 @@
 
             mediaList.forEach((mediaItem) => {
                 mediaItem.classList.add('loaded');
-
-                console.log('mediaItem', mediaItem.nodeName);
-
                 const parentBlade = mediaItem.closest(self.options.bladesSelector);
 
                 if (mediaItem.nodeName === "IMG") 
@@ -201,7 +198,7 @@
                         }
                         else {
                             if (imgLoopCounter > 12) {
-                                console.log('img could not be loaded in time');
+                                console.log('image could not be loaded in time');
                             }
                             self._getImageDimensions(mediaItem, parentBlade);
                         }
@@ -216,6 +213,7 @@
                     function runVidLoop() {
 
                         const hasVideoDimensions = mediaItem.videoWidth;
+                        console.log('has video dimensions', hasVideoDimensions);
 
                         if (!hasVideoDimensions && vidLoopCounter <= 20) {
                             vidLoopCounter++;                            
