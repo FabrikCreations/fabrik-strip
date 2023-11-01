@@ -29,6 +29,10 @@
         this.buttonNext = document.querySelector(this.options.pagerSelector + " .right");
         this.buttonPrev = document.querySelector(this.options.pagerSelector + " .left");
 
+        this.stripWidth = 0;
+        this.mediaCount = 0;
+        this.displayedMediaCount = 0;
+
         this._init();
     }
 
@@ -62,6 +66,7 @@
                 var viewableWidth = self.strip.offsetWidth,
                     halfView = (viewableWidth - BLADES[index].offsetWidth) /  2,
                     pull = beforeWidth - halfView;
+                
 
                 const maxPull = self.stripInner.offsetWidth - viewableWidth;
 
@@ -111,15 +116,13 @@
 
         _windowResize: function () {
 
-            var self = this,
-                h = window.innerHeight,
-                w = window.innerWidth;
+            const self = this;
 
-            self.strip.dataset.height = h;
-            self.strip.dataset.width = w;
+            self.strip.dataset.height = window.innerHeight;
+            self.strip.dataset.width = window.innerWidth;
 
-            self.strip.style.height = `${h}px`;
-            self.strip.style.maxHeight = `${h}px`;
+            self.strip.style.height = `${window.innerHeight}px`;
+            self.strip.style.maxHeight = `${window.innerHeight}px`;
 
             BLADES.forEach((blade) => {
                 blade.removeAttribute("style");
@@ -131,13 +134,22 @@
 
             BLADES.forEach((blade) => {
 
+                console.log('each blade')
+
                 if (blade.dataset.media && blade.dataset.widthFactor) {
                     bladeWidth = parseFloat(self.strip.dataset.height) * parseFloat(blade.dataset.widthFactor);
                     blade.style.width = `${bladeWidth}px`;
+
+                    console.log('media blade width', bladeWidth)
                 } 
+                else {
+                    bladeWidth = parseFloat(blade.dataset.width);
+
+                    console.log('normal blade width', parseFloat(bladeWidth))
+                }
 
                 // limit total width
-                totalWidth = totalWidth + bladeWidth;
+                totalWidth += bladeWidth;
             });
 
             setTimeout(function () {
@@ -166,70 +178,63 @@
 
             self.stripInner.style.width = "30000px";
 
-            let width = 0;
-
             const mediaList = document.querySelectorAll(`${self.options.bladesSelector} > img, ${self.options.bladesSelector} > video, ${self.options.bladesSelector} > .blade-video-link > video, ${self.options.bladesSelector} > .blade-video-link > img`);
-            const stripHeight = self.strip.offsetHeight;
-            let displayedMediaCount = 0;
+            self.mediaCount = mediaList.length;
 
-            console.log('media count', mediaList.length);
+            console.log('media count', self.mediaCount);
 
             mediaList.forEach((mediaItem) => {
                 mediaItem.classList.add('loaded');
 
-                mediaItem.addEventListener('transitionend', (event) => {
-                    
-                    if (event.propertyName === "visibility") 
-                    {
-                        setTimeout(() => 
-                        {
-                            const parentBlade = event.target.closest(self.options.bladesSelector);
+                console.log('mediaItem', mediaItem.nodeName);
 
-                            if (event.target.nodeName === "IMG") 
-                            {
-                                const img = event.target;
-                                const imageWidthFactor = img.naturalWidth / img.naturalHeight;
-                                let imageWidth = stripHeight * imageWidthFactor;
+                const parentBlade = mediaItem.closest(self.options.bladesSelector);
 
-                                if (isNaN(imageWidth)) {
-                                    imageWidth = stripHeight;
-                                }
-                                
-                                parentBlade.dataset.media = true;
-                                parentBlade.dataset.height = stripHeight;
-                                parentBlade.dataset.width = imageWidth;
-                                parentBlade.dataset.widthFactor = imageWidthFactor;
-                                parentBlade.style.width = `${imageWidth}px`;
+                if (mediaItem.nodeName === "IMG") 
+                {
+                    let imgLoopCounter = 0;
 
-                                width += imageWidth;
-                                displayedMediaCount++;
+                    function runImgLoop() {
 
-                                console.log("width of image", imageWidth, "running total", width)
+                        const hasImageDimensions = mediaItem.naturalWidth;
+                        console.log('has image dimensions', hasImageDimensions);
+
+                        if (!hasImageDimensions && imgLoopCounter <= 12) {
+                            imgLoopCounter++;
+                            setTimeout(runImgLoop, 250); 
+                        }
+                        else {
+                            if (imgLoopCounter > 12) {
+                                console.log('img could not be loaded in time');
                             }
-                            else if (event.target.nodeName === "VIDEO")
-                            {
-                                const video = event.target;
-                                const videoWidthFactor = video.videoWidth / video.videoHeight;
-                                let videoWidth = stripHeight * videoWidthFactor;
-
-                                if (isNaN(videoWidth)) {
-                                    videoWidth = stripHeight;
-                                }
-
-                                parentBlade.dataset.media = true;
-                                parentBlade.dataset.height = stripHeight;
-                                parentBlade.dataset.width = videoWidth;
-                                parentBlade.dataset.widthFactor = videoWidthFactor;
-                                parentBlade.style.width = `${videoWidth}px`;
-
-                                width += videoWidth;                              
-                                displayedMediaCount++;
-
-                                console.log("width of video", videoWidth, "running total", width)
-                            }
-                        }, 350);
+                            self._getImageDimensions(mediaItem, parentBlade);
+                        }
                     }
-                });
+
+                    setTimeout(runImgLoop, 250); 
+                }
+                else if (mediaItem.nodeName === "VIDEO")
+                {
+                    let vidLoopCounter = 0;
+
+                    function runVidLoop() {
+
+                        const hasVideoDimensions = mediaItem.videoWidth;
+
+                        if (!hasVideoDimensions && vidLoopCounter <= 20) {
+                            vidLoopCounter++;                            
+                            setTimeout(runVidLoop, 250); 
+                        }
+                        else {
+                            if (vidLoopCounter > 20) {
+                                console.log('video could not be loaded in time');
+                            }
+                            self._getVideoDimensions(mediaItem, parentBlade);
+                        }
+                    }
+
+                    setTimeout(runVidLoop, 250); 
+                }
             });
 
             var pagerWidth = self.buttonNext.offsetWidth,
@@ -245,34 +250,76 @@
             infoBlade.dataset.width = infoBlade.offsetWidth;
             infoBlade.classList.add("blade-loaded");
 
-            width += infoBlade.offsetWidth;
-            console.log("width of info", infoBlade.offsetWidth, "running total", width)
+            self.stripWidth += infoBlade.offsetWidth;
+            console.log("width of info", infoBlade.offsetWidth, "running total", self.stripWidth)
 
             if (mediaList.length) {
-                checkMediaLoaded();
+                self._checkMediaLoaded(mediaList.length);
             }
             else {
-                self.stripInner.style.width = `${width}px`;
+                self.stripInner.style.width = `${self.stripWidth}px`;
+            }
+        },
+
+        _checkMediaLoaded: function() {
+            console.log('checking media loaded');
+
+            const intervalId = setInterval(() => {
+
+                console.log('media count', this.mediaCount, 'displayed media count', this.displayedMediaCount);
+
+                if (this.mediaCount === this.displayedMediaCount) {
+                    clearInterval(intervalId); // Stop the interval if the numbers match
+                    this.stripInner.style.width = `${this.stripWidth}px`;
+                    console.log('total width with media', this.stripWidth);
+                }
+            }, 250);
+        },
+
+        _getImageDimensions: function (img, parent)  {
+
+            const imgHeight = this.strip.offsetHeight;
+            let imageWidthFactor = img.naturalWidth / img.naturalHeight;
+            let imageWidth = imgHeight * imageWidthFactor;
+
+            if (isNaN(imageWidth)) {
+                imageWidth = imgHeight;
+                imageWidthFactor = 1;
+            }
+            
+            parent.dataset.media = true;
+            parent.dataset.height = imgHeight;
+            parent.dataset.width = imageWidth;
+            parent.dataset.widthFactor = imageWidthFactor;
+            parent.style.width = `${imageWidth}px`;
+
+            this.stripWidth += imageWidth;
+            this.displayedMediaCount++;
+
+            console.log("width of image", imageWidth, "running total", this.stripWidth);
+        },
+
+        _getVideoDimensions: function (video, parent)  {
+
+            const videoHeight = this.strip.offsetHeight;
+            let videoWidthFactor = video.videoWidth / video.videoHeight;
+            let videoWidth = videoHeight * videoWidthFactor;
+
+            if (isNaN(videoWidth)) {
+                videoWidthFactor = 1.7777777778;
+                videoWidth = videoHeight * videoWidthFactor;
             }
 
-            function checkMediaLoaded() {
-                console.log('checking media loaded');
+            parent.dataset.media = true;
+            parent.dataset.height = videoHeight;
+            parent.dataset.width = videoWidth;
+            parent.dataset.widthFactor = videoWidthFactor;
+            parent.style.width = `${videoWidth}px`;
 
-                const intervalId = setInterval(() => {
+            this.stripWidth += videoWidth;                              
+            this.displayedMediaCount++;
 
-                    console.log('media count', mediaList.length, 'displayed media count', displayedMediaCount);
-
-                    if (mediaList.length === displayedMediaCount) {
-                        clearInterval(intervalId); // Stop the interval if the numbers match
-                        self.stripInner.style.width = `${width}px`;
-                        console.log('total width with media', width);
-                    }
-                }, 150);
-
-                setTimeout(() => {
-                    clearInterval(intervalId);
-                }, 5000);
-            }
+            console.log("width of video", videoWidth, "running total", this.stripWidth)
         },
 
         _setPull: function (int) {
@@ -352,14 +399,14 @@
                     index = 0;
 
                 // handle cursor keys
-                if (event.key == 37) {
+                if (event.key == "ArrowLeft") {
                     // go prev
                     activeIndex = parseInt(self.strip.dataset.activeIndex);
                     index = activeIndex - 1;
 
                     self.options.beforeChange(activeIndex);
                     self.goTo(index);
-                } else if (event.key == 39) {
+                } else if (event.key  == "ArrowRight") {
                     // go next
                     activeIndex = parseInt(self.strip.dataset.activeIndex);
                     index = activeIndex + 1;
