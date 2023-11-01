@@ -134,18 +134,14 @@
 
             BLADES.forEach((blade) => {
 
-                console.log('each blade')
-
                 if (blade.dataset.media && blade.dataset.widthFactor) {
                     bladeWidth = parseFloat(self.strip.dataset.height) * parseFloat(blade.dataset.widthFactor);
                     blade.style.width = `${bladeWidth}px`;
-
-                    console.log('media blade width', bladeWidth)
+                    console.log('media blade width', bladeWidth);
                 } 
                 else {
                     bladeWidth = parseFloat(blade.dataset.width);
-
-                    console.log('normal blade width', parseFloat(bladeWidth))
+                    console.log('normal blade width', parseFloat(bladeWidth));
                 }
 
                 // limit total width
