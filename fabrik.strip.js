@@ -200,6 +200,7 @@
                             if (imgLoopCounter > 12) {
                                 console.log('image could not be loaded in time');
                             }
+                            parentBlade.classList.add('loaded');
                             self._getImageDimensions(mediaItem, parentBlade);
                         }
                     }
