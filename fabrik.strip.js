@@ -231,21 +231,25 @@
                 }
             });
 
-            var pagerWidth = self.buttonNext.offsetWidth,
-                infoWidth = windowWidth - pagerWidth;
-
-            if (windowWidth >= 1200) {
-                infoWidth = self.strip.offsetWidth / 2;
-            }
-
             const infoBlade = document.querySelector(".project-info-blade");
-            infoBlade.style.width = `${infoWidth}px`;
 
-            infoBlade.dataset.width = infoBlade.offsetWidth;
-            infoBlade.classList.add("blade-loaded");
+            if (infoBlade) {
 
-            self.stripWidth += infoBlade.offsetWidth;
-            console.log("width of info", infoBlade.offsetWidth, "running total", self.stripWidth)
+                var pagerWidth = self.buttonNext.offsetWidth,
+                    infoWidth = windowWidth - pagerWidth;
+
+                if (windowWidth >= 1200) {
+                    infoWidth = self.strip.offsetWidth / 2;
+                }
+
+                
+                infoBlade.style.width = `${infoWidth}px`;
+                infoBlade.dataset.width = infoBlade.offsetWidth;
+                infoBlade.classList.add("blade-loaded");
+
+                self.stripWidth += infoBlade.offsetWidth;
+                console.log("width of info", infoBlade.offsetWidth, "running total", self.stripWidth);
+            }
 
             if (mediaList.length) {
                 self._checkMediaLoaded(mediaList.length);
