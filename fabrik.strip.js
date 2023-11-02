@@ -174,7 +174,7 @@
 
             self.stripInner.style.width = "30000px";
 
-            const mediaList = document.querySelectorAll(`${self.options.bladesSelector} > img, ${self.options.bladesSelector} > video, ${self.options.bladesSelector} > .blade-video-link > video, ${self.options.bladesSelector} > .blade-video-link > img`);
+            const mediaList = document.querySelectorAll(self.options.bladesMediaSelector);
             self.mediaCount = mediaList.length;
 
             console.log('media count', self.mediaCount);
@@ -445,6 +445,7 @@
 
     $.fn[PLUGIN_NAME].defaults = {
         bladesSelector: ".blade",
+        bladesMediaSelector: ".blade > img, .blade > video, .blade > .blade-video-link > video, .blade > .blade-video-link > img",
         innerStripSelector: ".strip",
         headerSelector: null,
         pagerSelector: ".strip-pagers",
