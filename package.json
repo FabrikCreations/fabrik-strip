@@ -1,6 +1,6 @@
 {
   "name": "fabrik-strip",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "layout plugin",
   "main": "fabrik.strip.js",
   "scripts": {
