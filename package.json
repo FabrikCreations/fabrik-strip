@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phil118/fabrik-strip.git"
+    "url": "https://github.com/FabrikCreations/fabrik-strip.git"
   },
-  "author": "Fabrik",
+  "author": "Fabrik (https://fabrik.io)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/phil118/fabrik-strip/issues"
+    "url": "https://github.com/FabrikCreations/fabrik-strip/issues"
   },
-  "homepage": "https://github.com/phil118/fabrik-strip#readme"
+  "homepage": "https://github.com/FabrikCreations/fabrik-strip#readme"
 }
