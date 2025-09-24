@@ -6,4 +6,4 @@ Plugin for the Fabrik default themes project details strip layout
 
 You can install via npm
 
-npm i @fabrikcreations/fabrik-strip --save-dev
+    npm i @fabrikcreations/fabrik-strip --save-dev
