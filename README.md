@@ -4,6 +4,6 @@ Plugin for the Fabrik default themes project details strip layout
 
 ## Setup
 
-You can install via bower
+You can install via npm
 
-    bower install fabrik-strip --save
+npm i @fabrikcreations/fabrik-strip --save-dev
